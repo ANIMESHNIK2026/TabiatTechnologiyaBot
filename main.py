@@ -255,15 +255,6 @@ async def broadcast_command(message: types.Message):
             logger.warning("Broadcast failed for %s: %s", chat_id, e)
             failed += 1
     await message.answer(f"✅ Фиристода шуд: {sent}\n❌ Нашуд: {failed}")
-
-
-@dp.message_handler(lambda message: not message.text.startswith("/"))
-async def echo(message: types.Message):
-    try:
-        await message.answer("Салом!")
-    except Exception as e:
-        logger.error("Failed to send message: %s", e)
-
 @dp.message_handler(commands=["allvideos"])
 async def all_videos(message: types.Message):
     try:
@@ -307,6 +298,15 @@ async def all_videos(message: types.Message):
 
     except Exception as e:
         await message.answer(f"Хатоги дар ҳолати қабули руйхати наворҳо: {e}")
+
+
+@dp.message_handler(lambda message: not message.text.startswith("/"))
+async def echo(message: types.Message):
+    try:
+        await message.answer("Салом!")
+    except Exception as e:
+        logger.error("Failed to send message: %s", e)
+
 
 
 
