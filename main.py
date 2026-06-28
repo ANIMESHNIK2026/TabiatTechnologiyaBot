@@ -264,6 +264,49 @@ async def echo(message: types.Message):
     except Exception as e:
         logger.error("Failed to send message: %s", e)
 
+@dp.message_handler(commands=["allvideos"])
+async def all_videos(message: types.Message):
+    try:
+        youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
+
+        # Получаем ID плейлиста "Uploads" (все видео канала)
+        channel_response = youtube.channels().list(
+            part="contentDetails",
+            id=CHANNEL_ID
+        ).execute()
+
+        uploads_playlist_id = channel_response["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+
+        videos = []
+        next_page_token = None
+
+        # Цикл для получения всех видео (по 50 за раз)
+        while True:
+            playlist_response = youtube.playlistItems().list(
+                part="snippet",
+                playlistId=uploads_playlist_id,
+                maxResults=50,
+                pageToken=next_page_token
+            ).execute()
+
+            for item in playlist_response["items"]:
+                title = item["snippet"]["title"]
+                video_id = item["snippet"]["resourceId"]["videoId"]
+                videos.append((title, video_id))
+
+            next_page_token = playlist_response.get("nextPageToken")
+            if not next_page_token:
+                break
+
+        # Формируем список для пользователя
+        response_text = "📺 Ҳаммаи наворҳои канал:\n\n"
+        for i, (title, video_id) in enumerate(videos, start=1):
+            response_text += f"{i}. {title}\nhttps://www.youtube.com/watch?v={video_id}\n\n"
+
+        await message.answer(response_text)
+
+    except Exception as e:
+        await message.answer(f"Хатоги дар ҳолати қабули руйхати наворҳо: {e}")
 
 
 
