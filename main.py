@@ -295,14 +295,14 @@ async def all_videos(message: types.Message):
             end = start + videos_per_page
             page_videos = videos[start:end]
 
-            response_text = "📺 Видео канала:\n\n"
+            response_text = "📺 Наворҳои канал:\n\n"
             for i, (title, video_id) in enumerate(page_videos, start=start + 1):
                 response_text += f"{i}. {title}\nhttps://www.youtube.com/watch?v={video_id}\n\n"
 
             await message.answer(response_text)
 
     except Exception as e:
-        await message.answer(f"Ошибка при получении списка видео: {e}")
+        await message.answer(f"Хатоги дар ҳолати қабули руйхати наворҳо: {e}")
 
 
 
