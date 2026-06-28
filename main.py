@@ -132,6 +132,7 @@ async def help_command(message: types.Message):
             "/start — Оғози кор бо бот\n"
             "/help — Менюи амалҳо\n"
             "/videos — Санҷиши видеоҳои нави YouTube\n"
+            "/allvideos — Ҳаммаи наворҳои канали ТАБИАТ ТЕХНОЛОГИЯ\n"
             "/subscribe — Обуна шудан ба огоҳиномаҳо\n"
             "/unsubscribe — Бекор кардани обуна\n"
             "/stats — Шумораи обунашудагон\n"
@@ -288,7 +289,11 @@ async def all_videos(message: types.Message):
             next_page_token = playlist_response.get("nextPageToken")
             if not next_page_token:
                 break
-
+videos_per_page = 20
+page = 1  # потом можно сделать выбор страницы
+start = (page - 1) * videos_per_page
+end = start + videos_per_page
+page_videos = videos[start:end]
         # Формируем список для пользователя
         response_text = "📺 Ҳаммаи наворҳои канал:\n\n"
         for i, (title, video_id) in enumerate(videos, start=1):
