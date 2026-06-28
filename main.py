@@ -256,12 +256,12 @@ async def broadcast_command(message: types.Message):
             logger.warning("Broadcast failed for %s: %s", chat_id, e)
             failed += 1
     await message.answer(f"✅ Фиристода шуд: {sent}\n❌ Нашуд: {failed}")
+    
 @dp.message_handler(commands=["allvideos"])
 async def all_videos(message: types.Message):
     try:
         youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
 
-        # Получаем ID плейлиста "Uploads" (все видео канала)
         channel_response = youtube.channels().list(
             part="contentDetails",
             id=CHANNEL_ID
@@ -272,7 +272,6 @@ async def all_videos(message: types.Message):
         videos = []
         next_page_token = None
 
-        # Цикл для получения всех видео (по 50 за раз)
         while True:
             playlist_response = youtube.playlistItems().list(
                 part="snippet",
@@ -289,18 +288,22 @@ async def all_videos(message: types.Message):
             next_page_token = playlist_response.get("nextPageToken")
             if not next_page_token:
                 break
-                
-        # Формируем список для пользователя
-        response_text = "📺 Ҳаммаи наворҳои канал:\n\n"
-        for i, (title, video_id) in enumerate(videos, start=1):
-            response_text += f"{i}. {title}\nhttps://www.youtube.com/watch?v={video_id}\n\n"
 
-# Отправляем список частями, если он слишком длинный
-for i in range(0, len(response_text), 4000):
-    await message.answer(response_text[i:i+4000])
+        # Отправляем список частями по 20 видео
+        videos_per_page = 20
+        for start in range(0, len(videos), videos_per_page):
+            end = start + videos_per_page
+            page_videos = videos[start:end]
+
+            response_text = "📺 Видео канала:\n\n"
+            for i, (title, video_id) in enumerate(page_videos, start=start + 1):
+                response_text += f"{i}. {title}\nhttps://www.youtube.com/watch?v={video_id}\n\n"
+
+            await message.answer(response_text)
 
     except Exception as e:
-        await message.answer(f"Хатоги дар ҳолати қабули руйхати наворҳо: {e}")
+        await message.answer(f"Ошибка при получении списка видео: {e}")
+
 
 
 @dp.message_handler(lambda message: not message.text.startswith("/"))
