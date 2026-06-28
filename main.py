@@ -289,17 +289,15 @@ async def all_videos(message: types.Message):
             next_page_token = playlist_response.get("nextPageToken")
             if not next_page_token:
                 break
-videos_per_page = 20
-page = 1  # потом можно сделать выбор страницы
-start = (page - 1) * videos_per_page
-end = start + videos_per_page
-page_videos = videos[start:end]
+                
         # Формируем список для пользователя
         response_text = "📺 Ҳаммаи наворҳои канал:\n\n"
         for i, (title, video_id) in enumerate(videos, start=1):
             response_text += f"{i}. {title}\nhttps://www.youtube.com/watch?v={video_id}\n\n"
 
-        await message.answer(response_text)
+# Отправляем список частями, если он слишком длинный
+for i in range(0, len(response_text), 4000):
+    await message.answer(response_text[i:i+4000])
 
     except Exception as e:
         await message.answer(f"Хатоги дар ҳолати қабули руйхати наворҳо: {e}")
