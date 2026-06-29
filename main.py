@@ -118,6 +118,7 @@ async def start_command(message: types.Message):
     try:
         await message.answer(
             "Салом! Хуш омадед ба боти Tabiat Technologiya 🌿\n\n"
+            "/help — Менюи амалҳо\n"
             "Ман ба шумо кӯмак мекунам. Паёми худро нависед!"
         )
     except Exception as e:
