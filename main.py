@@ -73,7 +73,7 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
         youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
 
         # Фильтр по последним 7 дням
-        published_after = (datetime.utcnow() - timedelta(days=7)).isoformat("T") + "Z"
+        published_after = (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
         request = youtube.search().list(
             part="snippet",
             channelId=CHANNEL_ID,
