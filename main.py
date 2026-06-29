@@ -69,11 +69,10 @@ subscribers: dict = load_subscribers()
 
 
 async def check_youtube(notify_chat=True, notify_subscribers=True):
-    await bot.send_message(CHAT_ID, "Тестовое сообщение ✅")
     try:
         youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
 
-        # Берём последние 5 видео без фильтра по времени
+        # Берём последние 5 видео
         request = youtube.search().list(
             part="snippet",
             channelId=CHANNEL_ID,
@@ -112,13 +111,15 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
             await bot.send_message(CHAT_ID, f"❌ Хатогӣ ҳангоми гирифтани видеоҳо: {e}")
         return []
 
+
 async def scheduler():
     # Душанбе UTC+5 → значит 00:00 Душанбе = 19:00 UTC (воскресенье)
     aioschedule.every().sunday.at("12:05").do(lambda: asyncio.create_task(check_youtube()))
 
     # Для проверки: запускаем задачу через пару минут
-    aioschedule.every().day.at("12:03").do(lambda: asyncio.create_task(check_youtube()))
-
+    aioschedule.every().day.at("7:20").do(lambda: asyncio.create_task(check_youtube()))
+# Для проверки: запускаем задачу через пару минут
+    aioschedule.every().day.at("12:20").do(lambda: asyncio.create_task(check_youtube()))
     while True:
         # Показываем текущее время сервера (UTC)
         now = datetime.datetime.utcnow()
