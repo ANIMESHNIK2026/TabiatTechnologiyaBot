@@ -113,23 +113,14 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
 
 
 async def scheduler():
-    # Душанбе UTC+5 → значит 00:00 Душанбе = 19:00 UTC (воскресенье)
-    aioschedule.every().sunday.at("12:05").do(lambda: asyncio.create_task(check_youtube()))
+    print("✅ Планировщик запущен")
 
-    # Для проверки: запускаем задачу через пару минут
-    aioschedule.every().day.at("7:27").do(lambda: asyncio.create_task(check_youtube()))
-# Для проверки: запускаем задачу через пару минут
-    aioschedule.every().day.at("12:27").do(lambda: asyncio.create_task(check_youtube()))
-    # Для проверки: запускаем задачу через пару минут
-    aioschedule.every().day.at("08:27").do(lambda: asyncio.create_task(check_youtube()))
+    # Тест: каждые 2 минуты
+    aioschedule.every(2).minutes.do(lambda: asyncio.create_task(check_youtube()))
+
     while True:
-        # Показываем текущее время сервера (UTC)
-        now = datetime.datetime.utcnow()
-        print("⏰ Текущее время (UTC):", now.strftime("%Y-%m-%d %H:%M:%S"))
-
-        aioschedule.run_pending()   # без await!
-        await asyncio.sleep(60)
-
+        aioschedule.run_pending()
+        await asyncio.sleep(1)
 
 @dp.message_handler(commands=["start"])
 async def start_command(message: types.Message):
