@@ -72,38 +72,45 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
     try:
         youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
 
-        # Фильтр по последним 7 дням
-        published_after = (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        # Берём последние 10 видео без фильтра
         request = youtube.search().list(
             part="snippet",
             channelId=CHANNEL_ID,
             order="date",
-            publishedAfter=published_after,
-            maxResults=5
+            maxResults=10
         )
         response = request.execute()
 
-        # Если нет новых видео → fallback
-        if not response.get("items"):
-            request = youtube.search().list(
-                part="snippet",
-                channelId=CHANNEL_ID,
-                order="date",
-                maxResults=5
-            )
-            response = request.execute()
-            if notify_chat:
-                await bot.send_message(CHAT_ID, "📭 Дар 7 рузи охир наворҳои нав илова нашудаст.\n👉 Аммо инҳоянд охирин 5 навор:")
-
+        cutoff = datetime.utcnow() - timedelta(days=7)
         videos = []
+
         for item in response["items"]:
             if "videoId" in item["id"]:
                 video_id = item["id"]["videoId"]
                 title = item["snippet"]["title"]
                 url = f"https://www.youtube.com/watch?v={video_id}"
-                videos.append((title, url))
-                if notify_chat:
-                    await bot.send_message(CHAT_ID, f"📺 {title}\n{url}")
+
+                # Проверяем дату публикации вручную
+                published_at = item["snippet"]["publishedAt"]
+                published_dt = datetime.strptime(published_at, "%Y-%m-%dT%H:%M:%SZ")
+
+                if published_dt >= cutoff:
+                    videos.append((title, url))
+                    if notify_chat:
+                        await bot.send_message(CHAT_ID, f"📺 Навори нав: {title}\n{url}")
+
+        # Если новых видео нет → fallback
+        if not videos:
+            if notify_chat:
+                await bot.send_message(CHAT_ID, "📭 Дар 7 рузи охир наворҳои нав нест.\n👉 Аммо инҳоянд охирин 5 навор:")
+            for item in response["items"][:5]:
+                if "videoId" in item["id"]:
+                    video_id = item["id"]["videoId"]
+                    title = item["snippet"]["title"]
+                    url = f"https://www.youtube.com/watch?v={video_id}"
+                    videos.append((title, url))
+                    if notify_chat:
+                        await bot.send_message(CHAT_ID, f"📺 {title}\n{url}")
 
         # Рассылка подписчикам
         if notify_subscribers and videos:
@@ -121,6 +128,7 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
         if notify_chat:
             await bot.send_message(CHAT_ID, f"❌ Хатогӣ ҳангоми гирифтани видеоҳо: {e}")
         return []
+
 
 
 
