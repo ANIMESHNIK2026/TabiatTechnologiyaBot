@@ -117,9 +117,11 @@ async def scheduler():
     aioschedule.every().sunday.at("12:05").do(lambda: asyncio.create_task(check_youtube()))
 
     # Для проверки: запускаем задачу через пару минут
-    aioschedule.every().day.at("7:20").do(lambda: asyncio.create_task(check_youtube()))
+    aioschedule.every().day.at("7:27").do(lambda: asyncio.create_task(check_youtube()))
 # Для проверки: запускаем задачу через пару минут
-    aioschedule.every().day.at("12:20").do(lambda: asyncio.create_task(check_youtube()))
+    aioschedule.every().day.at("12:27").do(lambda: asyncio.create_task(check_youtube()))
+    # Для проверки: запускаем задачу через пару минут
+    aioschedule.every().day.at("08:27").do(lambda: asyncio.create_task(check_youtube()))
     while True:
         # Показываем текущее время сервера (UTC)
         now = datetime.datetime.utcnow()
