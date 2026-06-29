@@ -26,7 +26,7 @@ dp = Dispatcher(bot)
 
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 CHANNEL_ID = os.getenv("CHANNEL_ID")
-CHAT_ID = "@tabiattehnologiya"
+CHAT_ID = -1002371278515
 SUBSCRIBERS_FILE = "subscribers.json"
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
 
@@ -116,7 +116,7 @@ async def scheduler():
     aioschedule.every().sunday.at("19:00").do(lambda: asyncio.create_task(check_youtube()))
 
     # Для проверки: запускаем задачу через пару минут
-    aioschedule.every().day.at("06:51").do(lambda: asyncio.create_task(check_youtube()))
+    aioschedule.every().day.at("07:00").do(lambda: asyncio.create_task(check_youtube()))
 
     while True:
         # Показываем текущее время сервера (UTC)
