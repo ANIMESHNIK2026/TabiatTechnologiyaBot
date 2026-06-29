@@ -107,7 +107,7 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
 
 
 async def scheduler():
-    aioschedule.every().monday.at("00:00").do(check_youtube)
+    aioschedule.every().monday.at("03:16").do(check_youtube)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(60)
