@@ -165,18 +165,17 @@ async def videos_command(message: types.Message):
         await message.answer("⚠️ YouTube API танзим нашудааст. Лутфан YOUTUBE_API_KEY ва CHANNEL_ID-ро илова кунед.")
         return
     try:
-        await message.answer("🔍 Дар ҳоли ҷустуҷӯи видеоҳои нав...")
+        await message.answer("🔍 Дар ҳоли ҷустуҷӯи охирин видеоҳо...")
         videos = await check_youtube(notify_chat=False, notify_subscribers=False)
         if videos:
             for title, url in videos:
                 await message.answer(f"📺 {title}\n{url}")
-            await message.answer(f"✅ {len(videos)} навор ёфт шуд!")
+            await message.answer(f"✅ {len(videos)} охирин навор нишон дода шуд!")
         else:
-            await message.answer("📭 Дар 7 рузи охир наворҳои нав нест.")
+            await message.answer("📭 Видео ёфт нашуд.")
     except Exception as e:
         logger.error("Videos command failed: %s", e)
-        await message.answer("❌ Хатогӣ ҳангоми гирифтани видеоҳо рӯй дод.")
-
+        await message.answer(f"❌ Хатогӣ ҳангоми гирифтани видеоҳо: {e}")
 
 @dp.message_handler(commands=["subscribe"])
 async def subscribe_command(message: types.Message):
