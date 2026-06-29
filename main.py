@@ -72,52 +72,34 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
     try:
         youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
 
-        # Берём последние 10 видео без фильтра
+        # Берём последние 5 видео без фильтра по времени
         request = youtube.search().list(
             part="snippet",
             channelId=CHANNEL_ID,
             order="date",
-            maxResults=10
+            maxResults=5
         )
         response = request.execute()
 
-        cutoff = datetime.utcnow() - timedelta(days=7)
         videos = []
-
         for item in response["items"]:
             if "videoId" in item["id"]:
                 video_id = item["id"]["videoId"]
                 title = item["snippet"]["title"]
                 url = f"https://www.youtube.com/watch?v={video_id}"
-
-                # Проверяем дату публикации вручную
-                published_at = item["snippet"]["publishedAt"]
-                published_dt = datetime.strptime(published_at, "%Y-%m-%dT%H:%M:%SZ")
-
-                if published_dt >= cutoff:
-                    videos.append((title, url))
-                    if notify_chat:
-                        await bot.send_message(CHAT_ID, f"📺 Навори нав: {title}\n{url}")
-
-        # Если новых видео нет → fallback
-        if not videos:
-            if notify_chat:
-                await bot.send_message(CHAT_ID, "📭 Дар 7 рузи охир наворҳои нав нест.\n👉 Аммо инҳоянд охирин 5 навор:")
-            for item in response["items"][:5]:
-                if "videoId" in item["id"]:
-                    video_id = item["id"]["videoId"]
-                    title = item["snippet"]["title"]
-                    url = f"https://www.youtube.com/watch?v={video_id}"
-                    videos.append((title, url))
-                    if notify_chat:
-                        await bot.send_message(CHAT_ID, f"📺 {title}\n{url}")
+                videos.append((title, url))
+                if notify_chat:
+                    await bot.send_message(CHAT_ID, f"📺 {title}\n{url}")
 
         # Рассылка подписчикам
         if notify_subscribers and videos:
             for chat_id in list(subscribers.keys()):
                 try:
                     for title, url in videos:
-                        await bot.send_message(int(chat_id), f"🔔 Навори нав аз Tabiat Technologiya:\n📺 {title}\n{url}")
+                        await bot.send_message(
+                            int(chat_id),
+                            f"🔔 Навори нав аз Tabiat Technologiya:\n📺 {title}\n{url}"
+                        )
                 except Exception as e:
                     logger.warning("Could not notify subscriber %s: %s", chat_id, e)
 
@@ -128,9 +110,6 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
         if notify_chat:
             await bot.send_message(CHAT_ID, f"❌ Хатогӣ ҳангоми гирифтани видеоҳо: {e}")
         return []
-
-
-
 
 async def scheduler():
     # Душанбе UTC+5 → значит 00:00 Душанбе = 19:00 UTC (воскресенье)
