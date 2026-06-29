@@ -117,17 +117,8 @@ async def scheduler():
     while True:
         now = datetime.datetime.utcnow()
 
-        # Тест каждые 2 минуты
-        await bot.send_message(CHAT_ID, "🔔 Тест: планировщик работает!")
-
         # Каждое воскресенье в 19:00 UTC
         if now.weekday() == 6 and now.hour == 19 and now.minute == 0:
-            await check_youtube()
-
-        # 🔧 Дополнительное условие для проверки — меняй часы сам
-        # Например, поставь текущее UTC время, чтобы проверить сразу
-        if now.hour == 8 and now.minute == 10:  # ← меняй на свои значения
-            await bot.send_message(CHAT_ID, "🕒 Проверка по твоему условию")
             await check_youtube()
 
         await asyncio.sleep(60)  # проверка каждую минуту
