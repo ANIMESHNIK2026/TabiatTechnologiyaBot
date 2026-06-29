@@ -111,12 +111,27 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
             await bot.send_message(CHAT_ID, f"❌ Хатогӣ ҳангоми гирифтани видеоҳо: {e}")
         return []
 
-
 async def scheduler():
     await bot.send_message(CHAT_ID, "✅ Планировщик запущен")
+
     while True:
+        now = datetime.datetime.utcnow()
+
+        # Тест каждые 2 минуты
         await bot.send_message(CHAT_ID, "🔔 Тест: планировщик работает!")
-        await asyncio.sleep(120)
+
+        # Каждое воскресенье в 19:00 UTC
+        if now.weekday() == 6 and now.hour == 19 and now.minute == 0:
+            await check_youtube()
+
+        # 🔧 Дополнительное условие для проверки — меняй часы сам
+        # Например, поставь текущее UTC время, чтобы проверить сразу
+        if now.hour == 8 and now.minute == 10:  # ← меняй на свои значения
+            await bot.send_message(CHAT_ID, "🕒 Проверка по твоему условию")
+            await check_youtube()
+
+        await asyncio.sleep(60)  # проверка каждую минуту
+
 
 @dp.message_handler(commands=["start"])
 async def start_command(message: types.Message):
