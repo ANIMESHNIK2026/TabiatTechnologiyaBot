@@ -10,6 +10,9 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 import aioschedule
 from flask import Flask
+import datetime
+import asyncio
+import aioschedule
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -107,8 +110,17 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
 
 
 async def scheduler():
-    aioschedule.every().monday.at("03:21").do(lambda: asyncio.create_task(check_youtube()))
+    # Душанбе UTC+5 → значит 00:00 Душанбе = 19:00 UTC (воскресенье)
+    aioschedule.every().sunday.at("19:00").do(lambda: asyncio.create_task(check_youtube()))
+
+    # Для проверки: запускаем задачу через пару минут
+    aioschedule.every().day.at("03:28").do(lambda: asyncio.create_task(check_youtube()))
+
     while True:
+        # Показываем текущее время сервера (UTC)
+        now = datetime.datetime.utcnow()
+        print("⏰ Текущее время (UTC):", now.strftime("%Y-%m-%d %H:%M:%S"))
+
         aioschedule.run_pending()   # без await!
         await asyncio.sleep(60)
 
