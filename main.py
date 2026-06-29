@@ -113,15 +113,10 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
 
 
 async def scheduler():
-    # Сообщение в канал при старте планировщика
     await bot.send_message(CHAT_ID, "✅ Планировщик запущен")
-
-    # Тест: каждые 2 минуты
-    aioschedule.every(2).minutes.do(lambda: asyncio.create_task(check_youtube()))
-
     while True:
-        aioschedule.run_pending()
-        await asyncio.sleep(60)
+        await bot.send_message(CHAT_ID, "🔔 Тест: планировщик работает!")
+        await asyncio.sleep(120)
 
 @dp.message_handler(commands=["start"])
 async def start_command(message: types.Message):
