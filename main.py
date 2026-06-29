@@ -113,10 +113,10 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
 
 async def scheduler():
     # Душанбе UTC+5 → значит 00:00 Душанбе = 19:00 UTC (воскресенье)
-    aioschedule.every().sunday.at("19:00").do(lambda: asyncio.create_task(check_youtube()))
+    aioschedule.every().sunday.at("12:05").do(lambda: asyncio.create_task(check_youtube()))
 
     # Для проверки: запускаем задачу через пару минут
-    aioschedule.every().day.at("07:00").do(lambda: asyncio.create_task(check_youtube()))
+    aioschedule.every().day.at("12:03").do(lambda: asyncio.create_task(check_youtube()))
 
     while True:
         # Показываем текущее время сервера (UTC)
