@@ -69,6 +69,7 @@ subscribers: dict = load_subscribers()
 
 
 async def check_youtube(notify_chat=True, notify_subscribers=True):
+    await bot.send_message(CHAT_ID, "Тестовое сообщение ✅")
     try:
         youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
 
