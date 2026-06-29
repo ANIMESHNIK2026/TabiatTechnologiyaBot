@@ -71,18 +71,29 @@ subscribers: dict = load_subscribers()
 async def check_youtube(notify_chat=True, notify_subscribers=True):
     try:
         youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
+
+        # Фильтр по последним 7 дням
+        published_after = (datetime.utcnow() - timedelta(days=7)).isoformat("T") + "Z"
         request = youtube.search().list(
             part="snippet",
             channelId=CHANNEL_ID,
             order="date",
-            publishedAfter=(datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            publishedAfter=published_after,
+            maxResults=5
         )
         response = request.execute()
 
-        if not response["items"]:
+        # Если нет новых видео → fallback
+        if not response.get("items"):
+            request = youtube.search().list(
+                part="snippet",
+                channelId=CHANNEL_ID,
+                order="date",
+                maxResults=5
+            )
+            response = request.execute()
             if notify_chat:
-                await bot.send_message(CHAT_ID, "📭 Дар 7 рузи охир наворҳои нав илова нашудаст.")
-            return []
+                await bot.send_message(CHAT_ID, "📭 Дар 7 рузи охир наворҳои нав илова нашудаст.\n👉 Аммо инҳоянд охирин 5 навор:")
 
         videos = []
         for item in response["items"]:
@@ -92,8 +103,9 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
                 url = f"https://www.youtube.com/watch?v={video_id}"
                 videos.append((title, url))
                 if notify_chat:
-                    await bot.send_message(CHAT_ID, f"📺 Навори нав: {title}\n{url}")
+                    await bot.send_message(CHAT_ID, f"📺 {title}\n{url}")
 
+        # Рассылка подписчикам
         if notify_subscribers and videos:
             for chat_id in list(subscribers.keys()):
                 try:
@@ -106,7 +118,10 @@ async def check_youtube(notify_chat=True, notify_subscribers=True):
 
     except Exception as e:
         logger.error("Failed to fetch YouTube videos: %s", e)
-        raise
+        if notify_chat:
+            await bot.send_message(CHAT_ID, f"❌ Хатогӣ ҳангоми гирифтани видеоҳо: {e}")
+        return []
+
 
 
 async def scheduler():
@@ -114,7 +129,7 @@ async def scheduler():
     aioschedule.every().sunday.at("19:00").do(lambda: asyncio.create_task(check_youtube()))
 
     # Для проверки: запускаем задачу через пару минут
-    aioschedule.every().day.at("03:28").do(lambda: asyncio.create_task(check_youtube()))
+    aioschedule.every().day.at("04:05").do(lambda: asyncio.create_task(check_youtube()))
 
     while True:
         # Показываем текущее время сервера (UTC)
