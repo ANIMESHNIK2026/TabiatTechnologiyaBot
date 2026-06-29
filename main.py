@@ -334,5 +334,10 @@ async def echo(message: types.Message):
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
+
+    # Запускаем планировщик как задачу
     loop.create_task(scheduler())
-    executor.start_polling(dp, skip_updates=True)
+
+    # Запускаем бота в том же loop
+    executor.start_polling(dp, skip_updates=True, loop=loop)
+
