@@ -319,7 +319,7 @@ async def all_videos(message: types.Message):
 # Обработка YouTube ссылок
 @dp.message_handler(lambda message: "youtube.com" in message.text or "youtu.be" in message.text)
 async def handle_youtube(message: types.Message):
-    await message.answer("⏳ Скачиваю видео...")
+    await message.answer("⏳ Боркунии навор...")
 
     try:
         url = message.text
