@@ -2,3 +2,4 @@ aiogram==2.25.1
 google-api-python-client
 aioschedule
 flask
+yt-dlp
