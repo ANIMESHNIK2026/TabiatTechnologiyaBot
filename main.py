@@ -316,18 +316,6 @@ async def all_videos(message: types.Message):
     except Exception as e:
         await message.answer(f"Хатоги дар ҳолати қабули руйхати наворҳо: {e}")
 
-
-
-@dp.message_handler(lambda message: not message.text.startswith("/"))
-async def echo(message: types.Message):
-    try:
-        await message.answer("Салом!")
-    except Exception as e:
-        logger.error("Failed to send message: %s", e)
-
-
-
-
 # Обработка YouTube ссылок
 @dp.message_handler(lambda message: "youtube.com" in message.text or "youtu.be" in message.text)
 async def handle_youtube(message: types.Message):
@@ -339,6 +327,13 @@ async def handle_youtube(message: types.Message):
         await bot.send_video(message.chat.id, open(file_path, "rb"))
     except Exception as e:
         await message.answer(f"❌ Хатогӣ ҳангоми скачивании: {e}")
+
+@dp.message_handler(lambda message: not message.text.startswith("/"))
+async def echo(message: types.Message):
+    try:
+        await message.answer("Салом!")
+    except Exception as e:
+        logger.error("Failed to send message: %s", e)
 
 
 if __name__ == "__main__":
