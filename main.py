@@ -325,6 +325,19 @@ async def echo(message: types.Message):
         logger.error("Failed to send message: %s", e)
 
 
+from pytube import YouTube
+
+# Обработка YouTube ссылок
+@dp.message_handler(lambda message: "youtube.com" in message.text or "youtu.be" in message.text)
+async def handle_youtube(message: types.Message):
+    await message.answer("⏳ Скачиваю видео...")
+    try:
+        yt = YouTube(message.text)
+        stream = yt.streams.get_highest_resolution()
+        file_path = stream.download(filename="video.mp4")
+        await bot.send_video(message.chat.id, open(file_path, "rb"))
+    except Exception as e:
+        await message.answer(f"❌ Хатогӣ ҳангоми скачивании: {e}")
 
 
 if __name__ == "__main__":
