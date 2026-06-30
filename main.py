@@ -13,6 +13,7 @@ from flask import Flask
 import datetime
 import asyncio
 import aioschedule
+from pytube import YouTube
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -325,7 +326,7 @@ async def echo(message: types.Message):
         logger.error("Failed to send message: %s", e)
 
 
-from pytube import YouTube
+
 
 # Обработка YouTube ссылок
 @dp.message_handler(lambda message: "youtube.com" in message.text or "youtu.be" in message.text)
