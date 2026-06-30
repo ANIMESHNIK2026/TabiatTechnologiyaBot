@@ -323,19 +323,40 @@ async def handle_youtube(message: types.Message):
 
     try:
         url = message.text
+        # Берём ID видео из ссылки
+        video_id = url.split("v=")[-1] if "v=" in url else url.split("/")[-1]
+        file_name = f"{video_id}.mp4"
+
         ydl_opts = {
             "format": "mp4",
-            "outtmpl": "video.mp4",   # сохраняем как video.mp4
+            "outtmpl": file_name,
+            # при необходимости можно добавить прокси:
+            # "proxy": "http://IP:PORT"
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
-        # Отправляем скачанное видео
-        await bot.send_video(message.chat.id, open("video.mp4", "rb"))
+        import os
+        if os.path.exists(file_name):
+            size = os.path.getsize(file_name)
+            if size < 50 * 1024 * 1024:  # лимит Telegram
+                await bot.send_video(message.chat.id, open(file_name, "rb"))
+            else:
+                await message.answer("⚠️ Навор барои Telegram калон аст. Ана ссилкаш:")
+                await message.answer(url)
+
+            # 🧹 Автоматическая очистка файла после отправки
+            try:
+                os.remove(file_name)
+            except Exception as e:
+                await message.answer(f"ℹ️ Маводи вақтиро поккарда нашуд: {e}")
+        else:
+            await message.answer("❌ Наворро скачать карда нашуд.")
 
     except Exception as e:
         await message.answer(f"❌ Хатогӣ ҳангоми скачивании: {e}")
+
 
 
 @dp.message_handler(lambda message: not message.text.startswith("/"))
