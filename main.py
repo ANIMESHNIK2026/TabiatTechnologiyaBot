@@ -13,7 +13,7 @@ from flask import Flask
 import datetime
 import asyncio
 import aioschedule
-from pytube import YouTube
+import yt_dlp
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -320,13 +320,23 @@ async def all_videos(message: types.Message):
 @dp.message_handler(lambda message: "youtube.com" in message.text or "youtu.be" in message.text)
 async def handle_youtube(message: types.Message):
     await message.answer("⏳ Скачиваю видео...")
+
     try:
-        yt = YouTube(message.text)
-        stream = yt.streams.get_highest_resolution()
-        file_path = stream.download(filename="video.mp4")
-        await bot.send_video(message.chat.id, open(file_path, "rb"))
+        url = message.text
+        ydl_opts = {
+            "format": "mp4",
+            "outtmpl": "video.mp4",   # сохраняем как video.mp4
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+
+        # Отправляем скачанное видео
+        await bot.send_video(message.chat.id, open("video.mp4", "rb"))
+
     except Exception as e:
         await message.answer(f"❌ Хатогӣ ҳангоми скачивании: {e}")
+
 
 @dp.message_handler(lambda message: not message.text.startswith("/"))
 async def echo(message: types.Message):
